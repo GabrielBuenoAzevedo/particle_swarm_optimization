@@ -41,14 +41,9 @@ class PSO:
       max_coords.append(coord[1])
     for i in range(0,self.population_size):
       population.append(
-        Particle({
-          'dimensions': len(self.search_space),
-          'coord_max': max_coords,
-          'coord_min': min_coords,
-          'min_vel': min_velocities,
-          'max_vel': max_velocities,
-          'fitness_func': self.fitness_func
-        })
+        Particle(coord_max = max_coords, coord_min = min_coords, 
+                min_vel = min_velocities, max_vel = max_velocities, 
+                fitness_func = self.fitness_func)
       )
     for index, particle in enumerate(population):
       pos_before = index - 1
@@ -65,17 +60,21 @@ class PSO:
   
   def runAlgorithm(self, num_iterations):
     for i in range(0, num_iterations):
-      for particle in self.population:
+      for index, particle in enumerate(self.population):
         particle.updateCoordinate()
+      for particle in self.population:
+        particle.updateNeighborhoodValues()
       self.population[0].showSelf()
+      # print(self.population[0].velocities, self.population[0].coordinates, self.population[0].neighborhood_best_coord)
       print('\n')
 
 
+#Testing code
 
 def fitness(coord):
   return coord.sum()
 
-pso = PSO(pop_size=5, 
+pso = PSO(pop_size=4, 
           search_space=[
             [1, 5],
             [1, 5],
@@ -85,7 +84,7 @@ pso = PSO(pop_size=5,
           ], vel_range=[
             [0, 0.4],
             [0, 0.4],
-            [-1, 0.1],
+            [-1, 0.25],
             [0, 0.4],
             [0, 0.2],
           ], fitness_func=fitness)
@@ -93,40 +92,4 @@ pso = PSO(pop_size=5,
 pso.createPopulation()
 pso.showPopulation()
 print('\n\n\n')
-pso.runAlgorithm(10)
-# pso.showPopulation()
-
-
-# particles = []
-# for i in range(1,5):
-#   particles.append(Particle({
-#     'dimensions': 5,
-#     'coord_max': [
-#       10, 5, 5, 10, 10
-#     ],
-#     'coord_min': [
-#       1, 1, 1, 5, 5
-#     ],
-#     'min_vel': [
-#       0, 0, 0, 0, 2
-#     ], 
-#     'max_vel': [
-#       1, 2, 3, 4, 5
-#     ],
-#     'fitness_func': fitness,
-#   }))
-
-# for index, particle in enumerate(particles):
-#   pos_before = index - 1
-#   pos_after = (index + 1)%len(particles)
-#   particle.setNeighborhood( [ particles[pos_before] , particles[pos_after] ])
-
-# print('Antes: ')
-# particles[0].showSelf()
-
-# for i in range(0,100):
-#   for particle in particles:
-#     particle.updateCoordinate()
-
-# print('\n\nDepois\n--------------------------------------')
-# particles[0].showSelf()
+pso.runAlgorithm(30)
