@@ -4,6 +4,7 @@ import numpy as np
 np.random.seed(41)
 
 class Particle:
+  #Constructor. Remember to rewrite this 
   def __init__(self, obj):
     if 'coord_max' in obj:
       coord_max = obj['coord_max']
@@ -70,22 +71,20 @@ class Particle:
     else:
       cog_const = 2.05
 
-    # self.coord_limits = coord_limits
     self.coord_min = coord_min
     self.coord_max = coord_max
     self.coordinates = coordinates
     self.dimensions = dimensions
     self.velocities = vel
     self.fitness_func = fitness_func
-    # self.neighborhood = neighborhood
     self.max_vel = max_vel
     self.min_vel = min_vel
     self.cog_const = cog_const
     self.soc_const = 4.1 - cog_const
-    # self.velocities_limits = velocities_limits
     self.best_coord = coordinates
     self.best_fitness = fitness_func(coordinates)
 
+  #Set the neighborhood of the particle
   def setNeighborhood(self, neighborhood):
     self.neighborhood = neighborhood
     best_fitness = float("-Inf")
@@ -98,10 +97,12 @@ class Particle:
       best_coord = self.coordinates
     self.neighborhood_best_coord = best_coord
     
+  #Show all variables contained within the particle
   def showSelf(self):
     selfVariables = vars(self)
     print('\n'.join("%s: %s" % item for item in selfVariables.items()))
 
+  #Show neighbor values
   def showNeighbors(self):
     for index, neighbor in enumerate(self.neighborhood):
       print('-----------------------------------------')
@@ -109,6 +110,7 @@ class Particle:
       print('Coordinates', neighbor.best_coord)
       print('Best fitness: ', neighbor.best_fitness)
   
+  #Update particle velocity
   def updateVelocity(self):
     velocity = self.velocities
     min_vel = self.min_vel
@@ -121,7 +123,9 @@ class Particle:
     new_vel = velocity + (soc_dist * random_soc) + (cog_dist + random_cog)
     new_vel = np.maximum(new_vel, min_vel)
     new_vel = np.minimum(new_vel, max_vel)
+    self.velocities = new_vel
 
+  #Update particle coordinates
   def updateCoordinate(self):
     self.updateVelocity()
     coordinate = self.coordinates
@@ -136,40 +140,4 @@ class Particle:
       self.best_coord = coordinate
     
 
-def fitness(coord):
-  return coord.sum()
 
-
-particles = []
-for i in range(1,5):
-  particles.append(Particle({
-    'dimensions': 5,
-    'coord_max': [
-      10, 5, 5, 10, 10
-    ],
-    'coord_min': [
-      1, 1, 1, 5, 5
-    ],
-    'min_vel': [
-      0, 0, 0, 0, 2
-    ], 
-    'max_vel': [
-      1, 2, 3, 4, 5
-    ],
-    'fitness_func': fitness,
-  }))
-
-for index, particle in enumerate(particles):
-  pos_before = index - 1
-  pos_after = (index + 1)%len(particles)
-  particle.setNeighborhood( [ particles[pos_before] , particles[pos_after] ])
-
-print('Antes: ')
-particles[0].showSelf()
-
-for i in range(0,100):
-  for particle in particles:
-    particle.updateCoordinate()
-
-print('\n\nDepois\n--------------------------------------')
-particles[0].showSelf()
